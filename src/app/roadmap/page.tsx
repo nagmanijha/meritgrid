@@ -1,12 +1,21 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import { PhaseInteractiveSection } from "./page-interactive";
+
+interface Topic {
+  name: string;
+  timeToFinish: string;
+  freeResources: string[];
+  caseBasedProblems: string[];
+}
 
 interface Phase {
   id: number;
   name: string;
   duration: string;
-  resources: string[];
+  topics?: Topic[];
+  resources?: string[];
   status: string;
 }
 
@@ -36,16 +45,86 @@ export default function RoadmapPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   
   const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
+    const [expandedPhase, setExpandedPhase] = useState<number | null>(null);
+    const [selectedTopic, setSelectedTopic] = useState<{ phaseId: number; topicName: string } | null>(null);
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+    const [feedbackSummary, setFeedbackSummary] = useState("");
 
   const startDiagnostic = (e: React.FormEvent) => {
     e.preventDefault();
     if (!goal.trim()) return;
+    
     setStep("diagnostic");
+  };
+
+  const handlePhaseBegin = (phaseId: number) => {
+    // If the current roadmap is the AI/ML overview, generate a detailed roadmap for Phase 1
+    if (!roadmap) return;
+    if (roadmap.title.includes("AI & ML")) {
+      if (phaseId === 1) {
+        const detailed: Roadmap = {
+          title: "AI & ML Roadmap",
+          phases: [
+            {
+              id: 1,
+              name: "Foundations: Math, Python & ML Basics",
+              duration: "6-10 weeks",
+              status: "in-progress",
+              topics: [
+                { name: "Linear Algebra & Calculus", timeToFinish: "1-2 weeks", freeResources: ["3Blue1Brown", "Khan Academy"], caseBasedProblems: ["Matrix ops for ML"] },
+                { name: "Probability & Statistics", timeToFinish: "1-2 weeks", freeResources: ["StatQuest", "Khan Academy"], caseBasedProblems: ["Bayes problems"] },
+                { name: "Python for Data Science", timeToFinish: "1-2 weeks", freeResources: ["Official Python Tutorial", "freeCodeCamp"], caseBasedProblems: ["Data munging exercises"] },
+                { name: "Data Wrangling & EDA", timeToFinish: "1 week", freeResources: ["Pandas docs", "Kaggle"], caseBasedProblems: ["EDA on dataset"] },
+                { name: "Intro to Machine Learning", timeToFinish: "1-2 weeks", freeResources: ["Andrew Ng - ML", "fast.ai intro"], caseBasedProblems: ["Implement linear regression"] },
+              ],
+            },
+            {
+              id: 2,
+              name: "Advanced Topics: Deep Learning & Specializations",
+              duration: "8-16 weeks",
+              status: "not-started",
+              topics: [
+                { name: "Deep Learning Fundamentals", timeToFinish: "3-4 weeks", freeResources: ["DeepLearning.AI", "fast.ai"], caseBasedProblems: ["Train CNN on sample dataset"] },
+                { name: "Natural Language Processing", timeToFinish: "2-4 weeks", freeResources: ["Hugging Face Tutorials"], caseBasedProblems: ["Text classification project"] },
+                { name: "Computer Vision", timeToFinish: "2-4 weeks", freeResources: ["OpenCV docs", "PyImageSearch"], caseBasedProblems: ["Image classification project"] },
+              ],
+            },
+          ],
+          caseStudy: { title: "Classification Project", description: "Build and deploy a classification model end-to-end." },
+        };
+
+        setRoadmap(detailed);
+        setExpandedPhase(1);
+      }
+      // Optionally handle Phase 2 generation in future
+    }
   };
 
   const submitLanguage = async (e: React.FormEvent) => {
     e.preventDefault();
     setStep("generating-diagnostic");
+
+    const goalLower = goal.trim().toLowerCase();
+    const isAiMl = goalLower.includes("ai") || goalLower.includes("ml") || goalLower.includes("machine learning") || goalLower.includes("artificial intelligence");
+
+    if (isAiMl) {
+      setTimeout(() => {
+        setQuestions([
+          { id: "ai_1", type: "mcq", question: "Which algorithm is commonly used for classification tasks?", options: ["Linear Regression", "Logistic Regression", "K-Means", "PCA"], answer: "Logistic Regression" },
+          { id: "ai_2", type: "mcq", question: "What is the primary purpose of an activation function in a neural network?", options: ["To initialize weights", "To introduce non-linearity", "To calculate loss", "To update biases"], answer: "To introduce non-linearity" },
+          { id: "ai_3", type: "mcq", question: "Which technique is used to prevent overfitting in deep learning models?", options: ["Gradient Descent", "Backpropagation", "Dropout", "One-hot encoding"], answer: "Dropout" },
+          { id: "ai_4", type: "mcq", question: "What does NLP stand for?", options: ["Natural Language Processing", "Neural Logic Programming", "Node Level Parsing", "Network Layer Protocol"], answer: "Natural Language Processing" },
+          { id: "ai_5", type: "mcq", question: "Which of the following is an unsupervised learning algorithm?", options: ["Decision Trees", "Random Forest", "K-Means Clustering", "Support Vector Machines"], answer: "K-Means Clustering" },
+          { id: "ai_6", type: "mcq", question: "What is the role of backpropagation?", options: ["To make predictions", "To calculate the gradient of the loss function", "To augment data", "To split data into train and test sets"], answer: "To calculate the gradient of the loss function" },
+          { id: "ai_7", type: "mcq", question: "Which metric is best for imbalanced classification datasets?", options: ["Accuracy", "F1-Score", "Mean Squared Error", "R-squared"], answer: "F1-Score" },
+          { id: "ai_8", type: "blank", question: "A __________ neural network is specifically designed to process grid-like data such as images.", options: [], answer: "convolutional" },
+          { id: "ai_9", type: "blank", question: "In reinforcement learning, the algorithm learns by maximizing a ________ signal.", options: [], answer: "reward" },
+          { id: "ai_10", type: "blank", question: "The process of adjusting model parameters to minimize the loss function is called ________.", options: [], answer: "optimization" }
+        ]);
+        setStep("diagnostic-quiz");
+      }, 1000);
+      return;
+    }
 
     try {
       const response = await fetch("/api/ai/generate-diagnostic", {
@@ -84,6 +163,48 @@ export default function RoadmapPage() {
     });
 
     setStep("generating-roadmap");
+
+    const goalLower = goal.trim().toLowerCase();
+    const isAiMl = goalLower.includes("ai") || goalLower.includes("ml") || goalLower.includes("machine learning") || goalLower.includes("artificial intelligence");
+
+    if (isAiMl) {
+      setTimeout(() => {
+        const detailed: Roadmap = {
+          title: "AI & ML Detailed Roadmap",
+          phases: [
+            {
+              id: 1,
+              name: "Foundations: Math, Python & ML Basics",
+              duration: "6-10 weeks",
+              status: "in-progress",
+              topics: [
+                { name: "Linear Algebra & Calculus", timeToFinish: "1-2 weeks", freeResources: ["3Blue1Brown", "Khan Academy"], caseBasedProblems: ["Matrix ops for ML"] },
+                { name: "Probability & Statistics", timeToFinish: "1-2 weeks", freeResources: ["StatQuest", "Khan Academy"], caseBasedProblems: ["Bayes problems"] },
+                { name: "Python for Data Science", timeToFinish: "1-2 weeks", freeResources: ["Official Python Tutorial", "freeCodeCamp"], caseBasedProblems: ["Data munging exercises"] },
+                { name: "Data Wrangling & EDA", timeToFinish: "1 week", freeResources: ["Pandas docs", "Kaggle"], caseBasedProblems: ["EDA on dataset"] },
+                { name: "Intro to Machine Learning", timeToFinish: "1-2 weeks", freeResources: ["Andrew Ng - ML", "fast.ai intro"], caseBasedProblems: ["Implement linear regression"] },
+              ],
+            },
+            {
+              id: 2,
+              name: "Advanced Topics: Deep Learning & Specializations",
+              duration: "8-16 weeks",
+              status: "not-started",
+              topics: [
+                { name: "Deep Learning Fundamentals", timeToFinish: "3-4 weeks", freeResources: ["DeepLearning.AI", "fast.ai"], caseBasedProblems: ["Train CNN on sample dataset"] },
+                { name: "Natural Language Processing", timeToFinish: "2-4 weeks", freeResources: ["Hugging Face Tutorials"], caseBasedProblems: ["Text classification project"] },
+                { name: "Computer Vision", timeToFinish: "2-4 weeks", freeResources: ["OpenCV docs", "PyImageSearch"], caseBasedProblems: ["Image classification project"] },
+                { name: "MLOps & Model Deployment", timeToFinish: "2-3 weeks", freeResources: ["MLOps Zoomcamp", "Docker Docs"], caseBasedProblems: ["Deploy model using FastAPI and Docker"] }
+              ],
+            },
+          ],
+          caseStudy: { title: "Classification Project", description: `You scored ${score}/10! Build and deploy an end-to-end classification model.` },
+        };
+        setRoadmap(detailed);
+        setStep("roadmap");
+      }, 1500);
+      return;
+    }
 
     try {
       const response = await fetch("/api/ai/generate-roadmap", {
@@ -195,7 +316,7 @@ export default function RoadmapPage() {
           {step === "generating-diagnostic" && (
             <div className="flex flex-col items-center justify-center mt-32 space-y-4">
               <span className="material-symbols-outlined text-primary text-4xl animate-spin">sync</span>
-              <p className="text-primary font-label-md uppercase tracking-widest animate-pulse">Generating 20-Question Diagnostic Quiz...</p>
+              <p className="text-primary font-label-md uppercase tracking-widest animate-pulse">Generating 10-Question Diagnostic Quiz...</p>
             </div>
           )}
 
@@ -203,7 +324,7 @@ export default function RoadmapPage() {
             <div className="max-w-[672px] mx-auto space-y-8">
               <div className="text-center mb-8">
                 <h2 className="text-headline-lg text-on-surface">Skill Diagnostic</h2>
-                <p className="text-body-lg text-on-surface-variant">Complete this 20-question quiz to empirically determine your starting point for {goal}.</p>
+                <p className="text-body-lg text-on-surface-variant">Complete this 10-question quiz to empirically determine your starting point for {goal}.</p>
               </div>
 
               <form onSubmit={submitQuiz} className="space-y-8">
@@ -280,16 +401,44 @@ export default function RoadmapPage() {
                     <div className="md:w-3/4">
                       <h4 className="text-label-sm text-on-surface-variant uppercase tracking-widest mb-3">Curated Resources</h4>
                       <div className="flex flex-wrap gap-2">
-                        {phase.resources.map(res => (
-                          <span key={res} className="px-3 py-1 bg-surface-container-highest border border-outline-variant rounded text-label-md text-on-surface">
+                        {(
+                          phase.resources?.length
+                            ? phase.resources
+                            : phase.topics?.flatMap(topic => topic.freeResources) ?? []
+                        ).map((res, index) => (
+                          <span key={`${res}-${index}`} className="px-3 py-1 bg-surface-container-highest border border-outline-variant rounded text-label-md text-on-surface">
                             {res}
                           </span>
                         ))}
                       </div>
-                      <div className="mt-4 flex justify-end">
-                        <button className="px-4 py-2 border border-primary text-primary hover:bg-primary hover:text-on-primary font-bold text-label-md uppercase rounded transition-colors">
-                          Begin Phase
+                      <div className="mt-4 flex flex-col gap-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (expandedPhase === phase.id) {
+                              setExpandedPhase(null);
+                              return;
+                            }
+                            setExpandedPhase(phase.id);
+                            handlePhaseBegin(phase.id);
+                          }}
+                          className="px-4 py-2 border border-primary text-primary hover:bg-primary hover:text-on-primary font-bold text-label-md uppercase rounded transition-colors"
+                        >
+                          {expandedPhase === phase.id ? "Close Phase" : "Begin Phase"}
                         </button>
+
+                        <PhaseInteractiveSection
+                          phase={phase}
+                          expandedPhase={expandedPhase}
+                          setExpandedPhase={setExpandedPhase}
+                          selectedTopic={selectedTopic}
+                          setSelectedTopic={setSelectedTopic}
+                          showFeedbackModal={showFeedbackModal}
+                          setShowFeedbackModal={setShowFeedbackModal}
+                          feedbackSummary={feedbackSummary}
+                          setFeedbackSummary={setFeedbackSummary}
+                          onPhaseBegin={handlePhaseBegin}
+                        />
                       </div>
                     </div>
                   </div>
