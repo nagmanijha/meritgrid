@@ -1,9 +1,17 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { GoogleGenAI } from '@google/genai';
 
 export async function POST(request: Request) {
   try {
-    const { goal, diagnosticScore, language } = await request.json();
+    const { goal, diagnosticScore, language: bodyLanguage, experience } = await request.json();
+    
+    const cookieStore = await cookies();
+    const cookieLang = cookieStore.get('meritgrid_lang')?.value;
+    const finalLanguage = cookieLang === 'hi' ? 'Hindi (Devenagari script)' : 
+                          cookieLang === 'ta' ? 'Tamil (Tamil script)' : 
+                          cookieLang === 'mr' ? 'Marathi (Devenagari script)' : 
+                          'English';
 
     if (!goal) {
       return NextResponse.json({ error: 'Goal is required' }, { status: 400 });
@@ -11,20 +19,20 @@ export async function POST(request: Request) {
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     
-    // Determine experience level based on diagnostic score out of 20
-    let derivedExperience = "Beginner";
-    if (diagnosticScore >= 15) {
+    // Determine experience level based on diagnostic score out of 5
+    let derivedExperience = experience || "Beginner";
+    if (diagnosticScore >= 4) {
       derivedExperience = "Advanced";
-    } else if (diagnosticScore >= 8) {
+    } else if (diagnosticScore >= 2) {
       derivedExperience = "Intermediate";
     }
 
     const prompt = `You are an expert career counselor, technical curriculum designer, and industry mentor.
 Generate a highly personalized, comprehensive learning roadmap for the skill goal: "${goal}".
-The learner just completed a rigorous 20-question diagnostic test and scored ${diagnosticScore}/20.
-Based on this empirical score, their objective skill level is: ${derivedExperience}.
+The learner just completed a rigorous 5-question diagnostic test and scored ${diagnosticScore}/5.
+Based on their stated experience "${experience}" and empirical score, their objective skill level is: ${derivedExperience}.
 
-CRITICAL REQUIREMENT: The entire output (including phase names, topic names, resource descriptions, case study details) MUST be written in ${language || 'English'}. If the language is Hindi, use Devangari script. If Tamil, use Tamil script, etc.
+CRITICAL REQUIREMENT: The entire output (including phase names, topic names, resource descriptions, case study details) MUST be written in ${finalLanguage}.
 
 Return the response strictly as a JSON object matching this schema:
 {

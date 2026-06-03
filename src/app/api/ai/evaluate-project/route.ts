@@ -1,10 +1,18 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { GoogleGenAI } from '@google/genai';
 import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
     const { projectLink } = await request.json();
+
+    const cookieStore = await cookies();
+    const cookieLang = cookieStore.get('meritgrid_lang')?.value;
+    const finalLanguage = cookieLang === 'hi' ? 'Hindi (Devenagari script)' : 
+                          cookieLang === 'ta' ? 'Tamil (Tamil script)' : 
+                          cookieLang === 'mr' ? 'Marathi (Devenagari script)' : 
+                          'English';
 
     if (!projectLink) {
       return NextResponse.json({ error: 'Project link is required' }, { status: 400 });
@@ -15,6 +23,9 @@ export async function POST(request: Request) {
     const prompt = `You are a strict technical evaluator. The user has submitted a project for evaluation: ${projectLink}.
 Since you cannot browse this link right now, assume they have built a standard MVP for their declared goal. 
 Evaluate it strictly but constructively.
+
+CRITICAL REQUIREMENT: The 'feedback' text MUST be written in ${finalLanguage}.
+
 Return the response strictly as a JSON object matching this schema:
 {
   "score": [integer 1-100],
@@ -38,21 +49,25 @@ Output nothing but valid JSON.`;
       // In a real app, you'd get the ID from the session JWT.
       const learnerId = 2;
       
-      await prisma.project.create({
-        data: {
-          title: `Project: ${new URL(projectLink).pathname.split('/').pop() || 'Submission'}`,
-          score: evaluation.score,
-          feedback: evaluation.feedback,
-          userId: learnerId
-        }
-      });
-      
-      await prisma.user.update({
-        where: { id: learnerId },
-        data: {
-          hireabilityIndex: { increment: evaluation.hireabilityIndexDelta }
-        }
-      });
+      try {
+        await prisma.project.create({
+          data: {
+            title: `Project: ${new URL(projectLink).pathname.split('/').pop() || 'Submission'}`,
+            score: evaluation.score,
+            feedback: evaluation.feedback,
+            userId: learnerId
+          }
+        });
+        
+        await prisma.user.update({
+          where: { id: learnerId },
+          data: {
+            hireabilityIndex: { increment: evaluation.hireabilityIndexDelta }
+          }
+        });
+      } catch (dbError: any) {
+        console.error("Database Error (Ignored for demo):", dbError.message);
+      }
 
       return NextResponse.json(evaluation);
     } else {

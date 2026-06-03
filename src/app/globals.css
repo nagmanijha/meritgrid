@@ -2,53 +2,53 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #FEFAE0; /* Ivory */
-  --color-on-background: #1E1E1E; /* Charcoal */
+  --color-background: #FCFBF8;
+  --color-on-background: #1C1917;
   
-  --color-surface: #F0EFEB; /* Sand */
-  --color-on-surface: #1E1E1E; /* Charcoal */
-  --color-surface-dim: #EAE8E3;
-  --color-surface-bright: #FFFFFF;
-  --color-surface-variant: #E5E4E2;
-  --color-on-surface-variant: #6B7280; /* Muted */
+  --color-surface: #EAE6DF;
+  --color-on-surface: #1C1917;
+  --color-surface-dim: #E0DED9;
+  --color-surface-bright: #FCFBF8;
+  --color-surface-variant: #DCD7D0;
+  --color-on-surface-variant: #44403C;
   
   --color-surface-container-lowest: #FFFFFF;
-  --color-surface-container-low: #FEFAE0;
-  --color-surface-container: #F0EFEB;
-  --color-surface-container-high: #EAE8E3;
-  --color-surface-container-highest: #E0DED9;
+  --color-surface-container-low: #FCFBF8;
+  --color-surface-container: #EAE6DF;
+  --color-surface-container-high: #E0DCD4;
+  --color-surface-container-highest: #D6D2CA;
 
-  --color-primary: #283618; /* Forest */
-  --color-on-primary: #FEFAE0; /* Ivory */
-  --color-primary-container: #606C38; /* Olive */
-  --color-on-primary-container: #FEFAE0;
+  --color-primary: #44403C;
+  --color-on-primary: #FCFBF8;
+  --color-primary-container: #1C1917;
+  --color-on-primary-container: #FCFBF8;
   
-  --color-primary-fixed: #606C38;
-  --color-primary-fixed-dim: #283618;
-  --color-on-primary-fixed: #FEFAE0;
-  --color-on-primary-fixed-variant: #FEFAE0;
-  --color-inverse-primary: #DDA15E;
+  --color-primary-fixed: #1C1917;
+  --color-primary-fixed-dim: #44403C;
+  --color-on-primary-fixed: #FCFBF8;
+  --color-on-primary-fixed-variant: #FCFBF8;
+  --color-inverse-primary: #EAE6DF;
   
-  --color-secondary: #606C38; /* Olive */
-  --color-on-secondary: #FEFAE0;
-  --color-secondary-container: #DDA15E; /* Bronze */
-  --color-on-secondary-container: #1E1E1E;
+  --color-secondary: #7C2D12;
+  --color-on-secondary: #FCFBF8;
+  --color-secondary-container: #9A3412;
+  --color-on-secondary-container: #FCFBF8;
   
-  --color-secondary-fixed: #DDA15E;
-  --color-secondary-fixed-dim: #BC6C25;
-  --color-on-secondary-fixed: #1E1E1E;
-  --color-on-secondary-fixed-variant: #1E1E1E;
+  --color-secondary-fixed: #9A3412;
+  --color-secondary-fixed-dim: #7C2D12;
+  --color-on-secondary-fixed: #FCFBF8;
+  --color-on-secondary-fixed-variant: #FCFBF8;
 
-  --color-tertiary: #DDA15E; /* Bronze */
-  --color-on-tertiary: #1E1E1E;
-  --color-tertiary-container: #BC6C25; /* Copper */
-  --color-on-tertiary-container: #FEFAE0;
+  --color-tertiary: #1C1917;
+  --color-on-tertiary: #FCFBF8;
+  --color-tertiary-container: #44403C;
+  --color-on-tertiary-container: #FCFBF8;
   
-  --color-tertiary-fixed: #BC6C25;
-  --color-tertiary-fixed-dim: #DDA15E;
+  --color-tertiary-fixed: #44403C;
+  --color-tertiary-fixed-dim: #1C1917;
   
-  --color-outline: #6B7280; /* Muted */
-  --color-outline-variant: #D1D5DB; /* Light gray */
+  --color-outline: #78716C;
+  --color-outline-variant: #D6D3D1;
   
   --color-error: #B3261E;
   --color-on-error: #FFFFFF;

@@ -3,7 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 
 export async function POST(request: Request) {
   try {
-    const { goal, language } = await request.json();
+    const { goal, language, experience } = await request.json();
 
     if (!goal) {
       return NextResponse.json({ error: 'Goal is required' }, { status: 400 });
@@ -12,7 +12,8 @@ export async function POST(request: Request) {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     
     const prompt = `You are an expert technical assessor specializing in ${goal}.
-Create a rigorous 10-question diagnostic test to accurately gauge a learner's current proficiency level in: "${goal}".
+The learner states they have ${experience || 'unknown'} level of experience.
+Create a rigorous 5-question diagnostic test to accurately gauge their true proficiency level in: "${goal}".
 Design questions to assess:
 - Foundational concepts and theory
 - Hands-on practical experience
@@ -23,8 +24,8 @@ Design questions to assess:
 Progressively increase difficulty from beginner to advanced levels. Questions should help determine if the learner is a Beginner, Intermediate, or Advanced practitioner.
 
 Requirements:
-1. Provide exactly 10 questions specifically related to gauging tech skill level in "${goal}".
-2. Mix of "mcq" (Multiple Choice) and "blank" (Fill in the blank). Make about 7 MCQs and 3 blanks.
+1. Provide exactly 5 questions specifically related to gauging tech skill level in "${goal}" for a ${experience || 'learner'}.
+2. Mix of "mcq" (Multiple Choice) and "blank" (Fill in the blank). Make about 4 MCQs and 1 blank.
 3. For MCQs, provide 3 to 4 closely related and highly plausible options.
 4. Questions should progressively assess skill maturity from Level 1 (Beginner) to Level 5 (Expert).
 5. DO NOT use em dashes anywhere in your response.

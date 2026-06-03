@@ -1,6 +1,19 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  const cookieStore = await cookies();
+  const hasSession = cookieStore.has("meritgrid_session");
+
+  const handleLogout = async () => {
+    "use server";
+    const cookieStore = await cookies();
+    cookieStore.delete("meritgrid_session");
+    cookieStore.delete("meritgrid_role");
+    redirect("/");
+  };
+
   return (
     <div className="bg-background text-on-background min-h-screen font-body-lg selection:bg-primary-container selection:text-on-primary-container">
       {/* Navigation */}
@@ -15,7 +28,7 @@ export default function Home() {
               <Link href="/roadmap" className="text-on-surface-variant hover:text-on-surface text-label-md uppercase tracking-widest font-bold transition-colors">Roadmaps</Link>
               <Link href="/playground" className="text-on-surface-variant hover:text-on-surface text-label-md uppercase tracking-widest font-bold transition-colors">Playground</Link>
               <Link href="/portfolio" className="text-on-surface-variant hover:text-on-surface text-label-md uppercase tracking-widest font-bold transition-colors">Projects</Link>
-              <Link href="/employer/dashboard" className="text-on-surface-variant hover:text-on-surface text-label-md uppercase tracking-widest font-bold transition-colors">Employers</Link>
+              <Link href="/command" className="text-on-surface-variant hover:text-on-surface text-label-md uppercase tracking-widest font-bold transition-colors">Employers</Link>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -24,8 +37,17 @@ export default function Home() {
               <span className="text-outline">Search platform...</span>
               <span className="ml-auto font-code-sm text-outline border border-outline-variant px-1 rounded">/</span>
             </div>
-            <Link href="/login" className="text-on-surface-variant hover:text-on-surface text-label-md uppercase tracking-widest font-bold px-4">Login</Link>
-            <Link href="/login" className="bg-primary text-on-primary text-label-md uppercase tracking-widest font-bold px-5 py-2 rounded border border-primary hover:bg-transparent hover:text-primary transition-all">Sign Up</Link>
+            {hasSession ? (
+              <form action={handleLogout} className="flex items-center gap-4">
+                <Link href="/roadmap" className="bg-surface-container text-on-surface border border-outline-variant text-label-md uppercase tracking-widest font-bold px-5 py-2 rounded hover:bg-surface-container-high transition-colors">Dashboard</Link>
+                <button type="submit" className="text-error hover:text-error/80 text-label-md uppercase tracking-widest font-bold px-4">Logout</button>
+              </form>
+            ) : (
+              <>
+                <Link href="/login" className="text-on-surface-variant hover:text-on-surface text-label-md uppercase tracking-widest font-bold px-4">Login</Link>
+                <Link href="/login" className="bg-primary text-on-primary text-label-md uppercase tracking-widest font-bold px-5 py-2 rounded border border-primary hover:bg-transparent hover:text-primary transition-all">Sign Up</Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -45,7 +67,7 @@ export default function Home() {
           </h1>
           
           <p className="mt-8 text-[20px] leading-relaxed text-on-surface-variant max-w-[672px] font-body-lg">
-            AI-generated learning roadmaps, industry-grade projects, competitive skill rankings, and employer discovery—all in one platform.
+            AI-generated learning roadmaps, industry-grade projects, competitive skill rankings, and employer discovery - all in one platform.
           </p>
           
           <div className="mt-12 flex flex-col sm:flex-row gap-4">
@@ -92,7 +114,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
         {/* Social Proof */}
         <section className="border-y border-outline-variant bg-surface-container-low py-12">
           <div className="max-w-max-width mx-auto px-8 grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-outline-variant/50">
@@ -177,8 +198,8 @@ export default function Home() {
                     <li className="flex items-center gap-3"><span className="material-symbols-outlined text-primary">check_circle</span> Personalized Learning Pacing</li>
                   </ul>
                 </div>
-                <div className="order-1 md:order-2 flex justify-center">
-                  <span className="material-symbols-outlined text-[120px] text-outline-variant">route</span>
+                <div className="order-1 md:order-2 flex justify-center w-full aspect-video rounded-xl overflow-hidden shadow-2xl border border-outline-variant">
+                  <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80" alt="Learn and Study" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
                 </div>
               </div>
 
@@ -188,8 +209,8 @@ export default function Home() {
 
               {/* PROVE */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div className="flex justify-center hidden md:flex">
-                  <span className="material-symbols-outlined text-[120px] text-outline-variant">verified</span>
+                <div className="flex justify-center hidden md:flex w-full aspect-video rounded-xl overflow-hidden shadow-2xl border border-outline-variant">
+                  <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80" alt="Coding and proving skills" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
                 </div>
                 <div className="ui-panel p-8 bg-surface border-l-4 border-l-secondary">
                   <div className="text-label-caps text-secondary mb-4 font-bold tracking-widest">STAGE 02</div>
@@ -219,8 +240,8 @@ export default function Home() {
                     <li className="flex items-center gap-3"><span className="material-symbols-outlined text-tertiary">check_circle</span> Employer Recruiter Dashboard</li>
                   </ul>
                 </div>
-                <div className="order-1 md:order-2 flex justify-center">
-                  <span className="material-symbols-outlined text-[120px] text-outline-variant">work</span>
+                <div className="order-1 md:order-2 flex justify-center w-full aspect-video rounded-xl overflow-hidden shadow-2xl border border-outline-variant">
+                  <img src="https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800&q=80" alt="Hiring and interviewing" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
                 </div>
               </div>
             </div>
@@ -307,6 +328,32 @@ export default function Home() {
                     <span className="bg-secondary text-on-secondary px-3 py-1 font-bold rounded">HI +120</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* AI Video Interviews & Proctoring */}
+        <section className="py-24 px-8 max-w-max-width mx-auto w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-[40px] font-bold text-on-surface leading-tight mb-6">Automated AI Video Interviews</h2>
+              <p className="text-body-lg text-on-surface-variant mb-8">
+                Go beyond code execution. Our AI proctoring engine conducts live technical interviews, tracking behavioral signals like eye contact, stress levels, and attention score to give employers a complete 360-degree view of your capabilities.
+              </p>
+              <ul className="space-y-4 text-body-md text-on-surface-variant font-medium">
+                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-primary">videocam</span> Live Technical Whiteboarding</li>
+                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-primary">psychology</span> Behavioral Analysis & Stress Tracking</li>
+                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-primary">analytics</span> Comprehensive Interview Scorecards</li>
+              </ul>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="ui-panel bg-surface border-t-4 border-t-secondary shadow-xl overflow-hidden aspect-square">
+                <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80" alt="AI Interview Candidate" className="w-full h-full object-cover" />
+              </div>
+              <div className="ui-panel bg-surface border-t-4 border-t-primary shadow-xl overflow-hidden aspect-square">
+                <img src="https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&q=80" alt="AI Proctoring Dashboard" className="w-full h-full object-cover" />
               </div>
             </div>
           </div>
@@ -471,7 +518,7 @@ export default function Home() {
             <Link href="/login" className="bg-on-primary text-primary text-label-md uppercase tracking-widest font-bold px-8 py-4 rounded hover:opacity-90 transition-opacity shadow-xl">
               Start Learning
             </Link>
-            <Link href="/employer/dashboard" className="bg-transparent border-2 border-on-primary text-on-primary text-label-md uppercase tracking-widest font-bold px-8 py-4 rounded hover:bg-on-primary hover:text-primary transition-colors">
+            <Link href="/command" className="bg-transparent border-2 border-on-primary text-on-primary text-label-md uppercase tracking-widest font-bold px-8 py-4 rounded hover:bg-on-primary hover:text-primary transition-colors">
               Explore Candidates
             </Link>
           </div>
@@ -479,8 +526,8 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-surface-container border-t border-outline-variant pt-20 pb-12">
-        <div className="max-w-max-width mx-auto px-8 grid grid-cols-1 md:grid-cols-5 gap-12 mb-16">
+      <footer className="bg-surface-container border-t border-outline-variant pt-12 pb-8">
+        <div className="max-w-max-width mx-auto px-8 grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
           <div className="col-span-1 md:col-span-2">
             <span className="font-bold text-headline-md text-primary block mb-6 uppercase tracking-tighter">MeritGrid</span>
             <p className="text-body-sm text-on-surface-variant max-w-[384px] mb-6">
@@ -498,7 +545,7 @@ export default function Home() {
               <li><Link href="/roadmap" className="hover:text-primary transition-colors">Roadmaps</Link></li>
               <li><Link href="/playground" className="hover:text-primary transition-colors">Playground</Link></li>
               <li><Link href="/portfolio" className="hover:text-primary transition-colors">Portfolio</Link></li>
-              <li><Link href="/employer/dashboard" className="hover:text-primary transition-colors">Employers</Link></li>
+              <li><Link href="/command" className="hover:text-primary transition-colors">Employers</Link></li>
             </ul>
           </div>
           

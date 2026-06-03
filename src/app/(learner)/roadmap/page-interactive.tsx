@@ -148,7 +148,7 @@ export function PhaseInteractiveSection({
               <button
                 onClick={() => {
                   setFeedbackSummary(
-                    `Based on your progress in "${selectedTopic.topicName}", here are personalized recommendations:\n\n📌 Focus Areas:\n• Strengthen your understanding of core concepts - practice 2-3 more problems\n• Work through the case-based problems to apply theory\n• Review areas where you scored below 70%\n\n💡 Strengths:\n• Good grasp of fundamentals\n• Quick problem-solving ability\n\n🎯 Next Steps:\n1. Complete 5 practice problems from the resources\n2. Build a small project applying these concepts\n3. Review your weak areas before moving to next topic`
+                    `Based on your progress in "${selectedTopic.topicName}", here are personalized recommendations:\n\n• Focus Areas:\n  - Strengthen your understanding of core concepts - practice 2-3 more problems\n  - Work through the case-based problems to apply theory\n  - Review areas where you scored below 70%\n\n• Strengths:\n  - Good grasp of fundamentals\n  - Quick problem-solving ability\n\n• Next Steps:\n  1. Complete 5 practice problems from the resources\n  2. Build a small project applying these concepts\n  3. Review your weak areas before moving to next topic`
                   );
                   setShowFeedbackModal(true);
                   setSelectedTopic(null);

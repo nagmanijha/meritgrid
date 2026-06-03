@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -18,8 +18,21 @@ model User {
   // Learner specific fields
   hireabilityIndex Int?     @default(1000)
   location        String?
+  budget          Int?
+  hoursPerWeek    Int?
+  availability    String?
+  
+  // Relations
   projects        Project[]
   skills          Skill[]
+  applications    Application[]
+  notifications   Notification[]
+  leaderboards    LeaderboardEntry[]
+  milestones      Milestone[]
+
+  // Employer specific fields
+  companyId       Int?
+  company         Company?  @relation(fields: [companyId], references: [id])
 }
 
 model Project {
@@ -39,4 +52,76 @@ model Skill {
   proficiency String   // Developing, Proficient, Mastered
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
+}
+
+model JobPosting {
+  id          Int           @id @default(autoincrement())
+  title       String
+  status      String        @default("LIVE") // LIVE, STANDBY
+  techStack   String
+  scheduledFor DateTime?
+  applicants  Int           @default(0)
+  createdAt   DateTime      @default(now())
+  applications Application[]
+}
+
+model Application {
+  id          Int        @id @default(autoincrement())
+  userId      Int
+  jobId       Int
+  fitScore    Int
+  status      String     @default("PENDING") // PENDING, INTERVIEWING, REJECTED
+  user        User       @relation(fields: [userId], references: [id])
+  job         JobPosting @relation(fields: [jobId], references: [id])
+  createdAt   DateTime   @default(now())
+}
+
+model PipelineLog {
+  id          Int      @id @default(autoincrement())
+  type        String   // JD, CANDIDATE, FLAG
+  title       String
+  meta        String
+  createdAt   DateTime @default(now())
+}
+
+model Company {
+  id          Int      @id @default(autoincrement())
+  name        String
+  industry    String
+  description String?
+  logo        String?
+  users       User[]
+  createdAt   DateTime @default(now())
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  title       String
+  message     String
+  type        String   // REMINDER, ALERT, MESSAGE
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model LeaderboardEntry {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  domain      String   // GLOBAL, BACKEND, FRONTEND
+  score       Int      @default(0)
+  elo         Int      @default(1200)
+  rank        Int?
+  updatedAt   DateTime @updatedAt
+}
+
+model Milestone {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  title       String
+  type        String   // PHASE, PROJECT, BADGE
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
 }

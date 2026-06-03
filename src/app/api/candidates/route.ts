@@ -1,13 +1,29 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const minHI = parseInt(searchParams.get('minHI') || '0', 10);
+    const skillParam = searchParams.get('skill');
+
+    const whereClause: any = { 
+      role: 'learner',
+      hireabilityIndex: { gte: minHI }
+    };
+
+    if (skillParam) {
+      whereClause.skills = {
+        some: { name: { contains: skillParam } }
+      };
+    }
+
     const candidates = await prisma.user.findMany({
-      where: { role: 'learner' },
+      where: whereClause,
       include: {
         skills: true,
         projects: true,
+        leaderboards: true
       },
       orderBy: { hireabilityIndex: 'desc' }
     });

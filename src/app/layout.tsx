@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,6 +16,7 @@ const geistMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "MeritGrid | Professional Engineering Platform",
   description: "AI-Powered Skill Validation & Employment Pathway Platform",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -31,6 +33,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased text-body-lg`}
       >
         {children}
+        <LanguageSelector />
       </body>
     </html>
   );
