@@ -3,6 +3,8 @@ import { cookies } from 'next/headers';
 import { GoogleGenAI } from '@google/genai';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
     const { projectLink } = await request.json();
